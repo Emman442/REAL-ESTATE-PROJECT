@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signInFailure, signInStart, signInSuccess } from "../redux/user/userSlice";
+import Oauth from "../components/Oauth";
 const BASE_URL = "http://localhost:3000";
 export default function SignIn() {
   const navigate = useNavigate();
@@ -62,6 +63,7 @@ export default function SignIn() {
         >
           {loading ? "Loading..." : "LOGIN"}
         </button>
+        <Oauth/>
       </form>
       <div className="flex gap-2 mt-5">
         <p>Have an Account? </p>

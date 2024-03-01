@@ -33,10 +33,15 @@ exports.Login = async (req, res, next) => {
       email,
     }).select("+password");
 
-    if(!validUser)
-       return next(errorHandler(404, "No user with these credential was found!"));
-    
-    const validPassword = bcrypt.compareSync(password, validUser?.password || "");
+    if (!validUser)
+      return next(
+        errorHandler(404, "No user with these credential was found!")
+      );
+
+    const validPassword = bcrypt.compareSync(
+      password,
+      validUser?.password || ""
+    );
     if (!validPassword) {
       return next(errorHandler(404, "Wrong Credential!"));
     }
@@ -48,10 +53,51 @@ exports.Login = async (req, res, next) => {
       }
     );
     res
-      .cookie("access_token", token, { httpOnly: true, path:'/', })
+      .cookie("access_token", token, { httpOnly: true, path: "/" })
       .status(200)
       .json({ validUser });
   } catch (error) {
     next(error);
+  }
+};
+exports.google = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (user) {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      res
+        .cookie("access_token", token, { httpOnly: true, path: "/" })
+        .status(200)
+        .json({ user });
+    } else {
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+      const hashedPassword = bcrypt.hashSync(generatedPassword, 10);
+      const newUser = new User({
+        username:
+          req.body.name.split(" ").join("").toLowerCase() +
+          Math.random().toString(36).slice(-4),
+        email: req.body.email,
+        password: hashedPassword,
+        avatar: req.body.photo
+      });
+      await newUser.save()
+      cnsole.log(newUser)
+       const token = jwt.sign(
+         { _id: validUser?._id || "" },
+         process.env.JWT_SECRET,
+         {
+           expiresIn: "1d",
+         }
+       );
+       res
+         .cookie("access_token", token, { httpOnly: true, path: "/" })
+         .status(200)
+         .json({ validUser });
+    }
+  } catch (error) {
+    console.log(error)
+    next(error)
   }
 };
