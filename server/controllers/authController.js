@@ -24,20 +24,33 @@ exports.signUp = async (req, res, next) => {
 };
 exports.Login = async (req, res, next) => {
   const { email, password } = req.body;
+  if (!email || !password) {
+    next(errorHandler(400, "Please provide your credentials!"));
+  }
 
   try {
     const validUser = await User.findOne({
       email,
-    });
+    }).select("+password");
 
-    const validPassword = bcrypt.compare(password, validUser?.password || '');
-    if (!validUser) {
-      next(errorHandler(404, "Wrong Credential!"));
+    if(!validUser)
+       return next(errorHandler(404, "No user with these credential was found!"));
+    
+    const validPassword = bcrypt.compareSync(password, validUser?.password || "");
+    if (!validPassword) {
+      return next(errorHandler(404, "Wrong Credential!"));
     }
-    const token = jwt.sign({ _id: validUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
-    res.cookie('access_token', token, {httpOnly: true}).status(200).json({validUser})
+    const token = jwt.sign(
+      { _id: validUser?._id || "" },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+    res
+      .cookie("access_token", token, { httpOnly: true, path:'/', })
+      .status(200)
+      .json({ validUser });
   } catch (error) {
     next(error);
   }

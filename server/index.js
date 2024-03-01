@@ -2,14 +2,17 @@ const express = require("express")
 const mongoose = require("mongoose");
 const cors = require("cors");
 const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv").config()
 
 const userRouter = require("./routes/userRoutes")
-const authRouter = require("./routes/authRoutes")
+const authRouter = require("./routes/authRoutes");
+
 const app= express() 
 app.use(cors()) 
 app.use(morgan("dev"))
 app.use(express.json())
+app.use(cookieParser())
 
 const PORT = 3000
 
