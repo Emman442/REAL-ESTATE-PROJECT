@@ -46,7 +46,7 @@ exports.Login = async (req, res, next) => {
       return next(errorHandler(404, "Wrong Credential!"));
     }
     const token = jwt.sign(
-      { _id: validUser?._id || "" },
+      { _id: validUser._id || "" },
       process.env.JWT_SECRET,
       {
         expiresIn: "1d",

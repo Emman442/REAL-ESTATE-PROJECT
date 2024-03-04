@@ -1,8 +1,13 @@
 import React from 'react'
 import {FaSearch} from "react-icons/fa"
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 export default function Header() {
+  const {currentUser} = useSelector(state=>state.user)
+  // console.log(currentUser.currentUser.user.avatar)
+  console.log(currentUser)
+  
   return (
     <header className=" bg-slate-200 shadow-md">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
@@ -27,12 +32,19 @@ export default function Header() {
               Home
             </li>
           </Link>
-          <Link to="/">
+          <Link to="/about">
             <li className="hidden sm:inline hover:underline text-slate-700">
               About
             </li>
           </Link>
-          <li className="hover:underline text-slate-700">Sign in </li>
+
+          <Link to={"/profile"}>
+            {currentUser? (
+              <img className='rounded-full h-8 w-8 object-cover' src={currentUser.validUser.avatar} alt="profile" />
+            ) : (
+              <li className="hover:underline text-slate-700">Sign in </li>
+            )}
+          </Link>
         </ul>
       </div>
     </header> //header tag is good for SEO purposes
